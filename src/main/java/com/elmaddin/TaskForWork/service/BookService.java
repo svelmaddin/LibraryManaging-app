@@ -1,10 +1,11 @@
-package com.elmaddin.TaskForWork;
+package com.elmaddin.TaskForWork.service;
 
 
 import com.elmaddin.TaskForWork.dto.BookResponse;
 import com.elmaddin.TaskForWork.dto.BookSaveRequest;
 import com.elmaddin.TaskForWork.exception.GenericException;
 import com.elmaddin.TaskForWork.model.BookEntity;
+import com.elmaddin.TaskForWork.model.UserEntity;
 import com.elmaddin.TaskForWork.repository.BookRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class BookService {
     private final BookRepository bookRepository;
+    private final UserService userService;
+    private final AuthService authService;
 
     @Transactional
     public BookResponse saveBook(BookSaveRequest bookSaveRequest) {
+        UserEntity user = userService.findUserByUsername(authService.getLoggedInUsername());
         final BookEntity book = BookEntity.builder()
                 .name(bookSaveRequest.getName())
                 .price(bookSaveRequest.getPrice())
@@ -60,7 +64,6 @@ public class BookService {
                 .build();
     }
 
-
     public BookResponse getById(Long id) {
         final BookEntity fromDb = bookRepository.findById(id).orElseThrow(GenericException::new);
         return BookResponse.builder()
@@ -70,6 +73,18 @@ public class BookService {
                 .author(fromDb.getAuthor())
                 .pageCount(fromDb.getPageCount())
                 .build();
+    }
+    public List<BookResponse> getByUserId() {
+        UserEntity user = userService.findUserByUsername(authService.getLoggedInUsername());
+        return bookRepository.findByUserId(user.getId()).stream().map(
+                        model -> BookResponse.builder()
+                                .id(model.getId())
+                                .name(model.getName())
+                                .price(model.getPrice())
+                                .author(model.getAuthor())
+                                .pageCount(model.getPageCount())
+                                .build())
+                .collect(Collectors.toList());
     }
 
     public void updateBook(Long id, BookSaveRequest request) {

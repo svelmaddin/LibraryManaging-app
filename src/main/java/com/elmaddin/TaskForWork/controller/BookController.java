@@ -1,7 +1,7 @@
 package com.elmaddin.TaskForWork.controller;
 
 
-import com.elmaddin.TaskForWork.BookService;
+import com.elmaddin.TaskForWork.service.BookService;
 import com.elmaddin.TaskForWork.dto.BookResponse;
 import com.elmaddin.TaskForWork.dto.BookSaveRequest;
 import org.springframework.http.HttpStatus;
@@ -31,6 +31,12 @@ public class BookController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(bookService.getAllBook());
+    }
+    @GetMapping("/userbooks")
+    public ResponseEntity<List<BookResponse>> getUserAllBook() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(bookService.getByUserId());
     }
 
     @GetMapping("/{name}")

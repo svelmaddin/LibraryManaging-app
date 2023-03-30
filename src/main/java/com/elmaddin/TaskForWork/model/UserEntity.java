@@ -19,6 +19,8 @@ public class UserEntity {
     private Long id;
     private String username;
     private String password;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @OneToMany(mappedBy = "user")
     private List<BookEntity> books;
